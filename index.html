@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-width=1.0">
+    <title>משחק הלכה - פרק ל"ד</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9ecef;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        #game-container {
+            background: white;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-top: 5px solid #2c3e50;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .question {
+            font-size: 22px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #1a252f;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        button.option-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        button.option-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        button.option-btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            color: #7f8c8d;
+        }
+        .correct {
+            background-color: #2ecc71 !important;
+            color: white !important;
+            font-weight: bold;
+        }
+        .wrong {
+            background-color: #e74c3c !important;
+            color: white !important;
+        }
+        #score-container {
+            margin-top: 30px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        #score {
+            color: #f39c12;
+            font-size: 24px;
+        }
+        #next-btn {
+            margin-top: 25px;
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            font-family: inherit;
+        }
+        #next-btn:hover {
+            background-color: #d68910;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <h1>משחק טריוויה: הלכה פרק ל"ד</h1>
+    <div id="quiz-area">
+        <div class="question" id="question">טוען שאלה...</div>
+        <div class="options" id="options"></div>
+        <button id="next-btn" onclick="nextQuestion()">לשאלה הבאה</button>
+    </div>
+    <div id="score-container">
+        נקודות: <span id="score">0</span>
+    </div>
+</div>
+
+<script>
+    // === כאן אתה מעדכן את השאלות שלך ===
+    // correctAnswer מתחיל מ-0. כלומר: 0 זה הראשון, 1 זה השני, 2 זה השלישי וכן הלאה.
+    const questions = [
+        {
+            question: "מהו הכלל המרכזי שנלמד בפרק ל'ד?",
+            options: ["תשובה נכונה לדוגמה", "תשובה שגויה 1", "תשובה שגויה 2", "תשובה שגויה 3"],
+            correctAnswer: 0
+        },
+        {
+            question: "מי פטור מהדין המוזכר בפרק?",
+            options: ["רק גברים", "נשים וילדים (זו התשובה הנכונה)", "כולם חייבים", "מי שנמצא בדרך"],
+            correctAnswer: 1
+        },
+        {
+            question: "לפי פרק ל'ד, מתי יש לקיים את ההלכה?",
+            options: ["בבוקר", "בערב", "בצהריים", "בכל שעות היממה (תשובה נכונה)"],
+            correctAnswer: 3
+        }
+    ];
+    // ===================================
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    function loadQuestion() {
+        const currentQuestion = questions[currentQuestionIndex];
+        document.getElementById('question').innerText = currentQuestion.question;
+        const optionsContainer = document.getElementById('options');
+        optionsContainer.innerHTML = '';
+
+        currentQuestion.options.forEach((option, index) => {
+            const button = document.createElement('button');
+            button.innerText = option;
+            button.classList.add('option-btn');
+            button.onclick = () => checkAnswer(index, button);
+            optionsContainer.appendChild(button);
+        });
+        document.getElementById('next-btn').style.display = 'none';
+    }
+
+    function checkAnswer(selectedIndex, button) {
+        const currentQuestion = questions[currentQuestionIndex];
+        const allButtons = document.querySelectorAll('.option-btn');
+        
+        // נעילת כל הכפתורים אחרי בחירה
+        allButtons.forEach(btn => btn.disabled = true);
+
+        if (selectedIndex === currentQuestion.correctAnswer) {
+            button.classList.add('correct');
+            score += 10; // על כל תשובה נכונה מקבלים 10 נקודות
+            document.getElementById('score').innerText = score;
+        } else {
+            button.classList.add('wrong');
+            // מראה מה הייתה התשובה הנכונה
+            allButtons[currentQuestion.correctAnswer].classList.add('correct');
+        }
+
+        document.getElementById('next-btn').style.display = 'inline-block';
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < questions.length) {
+            loadQuestion();
+        } else {
+            document.getElementById('quiz-area').innerHTML = `
+                <h2>כל הכבוד! סיימת את המשחק.</h2>
+                <p style="font-size: 20px;">הציון הסופי שלך הוא: <strong>${score}</strong> מתוך ${questions.length * 10}</p>
+                <button onclick="location.reload()" class="option-btn" style="margin-top:20px; background-color: #2c3e50;">שחק שוב</button>
+            `;
+            document.getElementById('score-container').style.display = 'none';
+        }
+    }
+
+    // טעינת השאלה הראשונה מיד כשהעמוד עולה
+    loadQuestion();
+</script>
+</body>
+</html>
